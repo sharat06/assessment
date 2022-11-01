@@ -1,0 +1,31 @@
+image: python:3.9
+
+stages:
+  - deploy
+
+
+deploy-prd:
+  stage: deploy
+  variable:
+    HELM_DIR: 'helm/app'
+    HELM_DEPLOY_NAME: 'env-echo'
+    NAMESPACE: 'env-echo-prod-ns'
+    KUBECONTEXT: 'k8s-prd-cluster'
+    SECRET_FILE_PATH: 'helm/app/templates/'
+    VALUES_FILE: '$HELM_DIR/values/prd.yml'
+    SECRETS_FILE: '$SECRET_FILE_PATH/env-echo-secrets.yml'
+  before_script:
+    - pip install python-gnupg
+  script:
+    - python generate_key.py
+    - python update_and_encrypt_secrets.py --key HASURA_TEST --value TEST_SECRET --service env-echo --existing true
+    # Decrypt updated GPG secrets file with PASSPHRASE defined in CICD variables(masked)
+    - echo $GPG_PASSPHRASE | gpg --decrypt --batch --yes --passphrase-fd 0 -d $SECRET_FILE_PATH/env-echo-secrets.yml.gpg > $SECRETS_FILE
+    - |
+      if [[ $? -eq 0 ]]; then 
+        rm $SECRET_FILE_PATH/env-echo-secrets.yml.gpg
+      else
+        echo "Secrets file is not decrypted. Exiting"
+        exit 1
+      fi
+    - helm upgrade --install $HELM_DEPLOY_NAME $HELM_DIR --set Commit=${CI_COMMIT_SHORT_SHA} -f $VALUES_FILE --atomic --kube-context ${KUBECONTEXT} --namespace ${NAMESPACE}

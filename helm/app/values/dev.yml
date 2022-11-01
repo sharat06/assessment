@@ -1,0 +1,13 @@
+#This is overwrite values file for DEV Env
+# Resource Requests and Limits
+Cpu: "1.0"
+Memory: "2G"
+MaxCpu: "2.0"
+MaxMemory: "4G"
+
+# Replicas
+MinReplicas: 1
+
+# Service ELB
+service:
+  dnsname: hassura.dev.api.com

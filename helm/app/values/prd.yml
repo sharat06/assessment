@@ -1,0 +1,13 @@
+#This is overwrite values file for QA Env
+# Resource Requests and Limits
+Cpu: "2.0"
+Memory: "3G"
+MaxCpu: "4.0"
+MaxMemory: "6G"
+
+# Replicas
+MinReplicas: 3
+
+# Service ELB
+service:
+  dnsname: hassura.prd.api.com

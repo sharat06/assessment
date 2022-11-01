@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  labels:
+    app: {{ .Values.App }}
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - {{ .Values.service.dnsname }}
+    secretName: kubernetes-tls
+  rules:
+  - host: {{ .Values.service.dnsname }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: echo-env-service
+            port:
+              number: 8080

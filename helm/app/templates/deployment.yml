@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Values.app }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.MinReplicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Values.app }}
+          image: "{{ .Values.image.repository }}:{{ .Values.Commit }}"
+          command: ["oiffs"]
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.ContainerPort }}
+          resources:
+            limits:
+              cpu: {{ .Values.MaxCpu }}
+              memory: {{ .Values.MaxMemory }}
+            requests:
+              cpu: {{ .Values.Cpu }}
+              memory: {{ .Values.Memory }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.LivenessProbePath | quote }}
+              port: {{ .Values.ContainerPort }}
+            initialDelaySeconds: {{ .Values.LivenessProbeInitialDelaySeconds }}
+            timeoutSeconds: {{ .Values.LivenessTimeoutSeconds }}
+            periodSeconds: {{ .Values.LivenessProbePeriodSeconds }}
+            SuccessThreshold: {{ .Values.LivenessSuccessThreshold }}
+            FailureThreshold: {{ .Values.LivenessFailureThreshold }}

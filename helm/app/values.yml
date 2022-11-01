@@ -1,0 +1,31 @@
+#Default Values that will be applied by helm if no overwrite values file is passed
+# Application Metadata
+App: "env-echo"
+ImagePullPolicy: "IfNotPresent"
+
+# Container Image
+Image: "github.com/sharat06/env-echo-image"
+Commit: "dummyValue" # This value is overwritten in deploy job.
+ContainerPort: 8080
+
+# Resource Requests and Limits
+Cpu: "1.0"
+Memory: "2G"
+MaxCpu: "2.0"
+MaxMemory: "4G"
+
+#Replica
+MinReplicas: 1
+
+# Probes
+LivenessProbePath: "/"
+LivenessProbeInitialDelaySeconds: 10
+LivenessProbePeriodSeconds: 5
+LivenessTimeoutSeconds: 10
+LivenessSuccessThreshold: 1
+LivenessFailureThreshold: 3
+
+# PodDisruptionBudget
+Pdb: 1
+
+
