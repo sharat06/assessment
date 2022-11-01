@@ -6,7 +6,7 @@ stages:
 
 deploy-prd:
   stage: deploy
-  variable:
+  variables:
     HELM_DIR: 'helm/app'
     HELM_DEPLOY_NAME: 'env-echo'
     NAMESPACE: 'env-echo-prod-ns'
